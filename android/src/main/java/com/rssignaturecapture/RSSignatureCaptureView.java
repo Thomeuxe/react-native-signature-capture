@@ -68,9 +68,10 @@ public class RSSignatureCaptureView extends View {
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 
-		mMinWidth = convertDpToPx(8);
-		mMaxWidth = convertDpToPx(16);
-		mVelocityFilterWeight = 0.4f;
+		mStrokeWidth = convertDpToPx(50);
+		mMinWidth = convertDpToPx(50);
+		mMaxWidth = convertDpToPx(50);
+		mVelocityFilterWeight = 0;
 		mPaint.setColor(Color.BLACK);
 
 		//Dirty rectangle to update only the changed portion of the view
@@ -130,24 +131,15 @@ public class RSSignatureCaptureView extends View {
 			TimedPoint startPoint = curve.startPoint;
 			TimedPoint endPoint = curve.endPoint;
 
-			float velocity = endPoint.velocityFrom(startPoint);
-			velocity = Float.isNaN(velocity) ? 0.0f : velocity;
-
-			velocity = mVelocityFilterWeight * velocity
-					+ (1 - mVelocityFilterWeight) * mLastVelocity;
-
 			// The new width is a function of the velocity. Higher velocities
 			// correspond to thinner strokes.
-			float newWidth = strokeWidth(velocity);
+			float newWidth = strokeWidth(mStrokeWidth);
 
 			// The Bezier's width starts out as last curve's final width, and
 			// gradually changes to the stroke width just calculated. The new
 			// width calculation is based on the velocity between the Bezier's
 			// start and end mPoints.
 			addBezier(curve, mLastWidth, newWidth);
-
-			mLastVelocity = velocity;
-			mLastWidth = newWidth;
 
 			// Remove the first element from the list,
 			// so that we always have no more than 4 mPoints in mPoints array.
